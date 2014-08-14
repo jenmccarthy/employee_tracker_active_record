@@ -1,5 +1,6 @@
 require 'active_record'
 require './lib/employee'
+require './lib/division'
 
 ActiveRecord::Base.establish_connection(YAML::load(File.open('./db/config.yml'))['development'])
 
@@ -11,16 +12,24 @@ end
 def menu
   choice = nil
   until choice == 'x'
-    puts "Press 'a' to add an employee, 'l' to list an employee, or 'f' to mark an employee as fired"
+    puts "'a' to add an employee"
+    puts "'l' to list an employee"
+    puts "'f' to mark an employee as fired"
+    puts "'c' to create a division"
+    puts "'d' to list out divisions"
     puts "Press 'x' to exit"
     choice = gets.chomp
     case choice
     when 'a'
       add_employee
+    when 'c'
+      add_division
     when 'l'
       list_employees
     when 'f'
       mark_fired
+    when 'd'
+      list_divisions
     when 'x'
       puts 'Have a good day!'
     else
@@ -32,14 +41,27 @@ end
 def add_employee
   puts "What is his/her name?"
   employee_name = gets.chomp
-  employee = Employee.new(name: employee_name)
+  employee = Employee.new(name: employee_name, fired: false)
   employee.save
-  "'#{employee.name}'' has been saved to the system."
+  "'#{employee_name}' has been saved to the system."
+end
+
+def add_division
+  puts "What is the name of this division?"
+  division_name = gets.chomp
+  division = Division.new(name: division_name)
+  division.save
+  "'#{division_name}' has been saved to the system."
 end
 
 def list_employees
   puts "Here are all the employees: "
   Employee.current_employees.each { |employee| puts employee.name }
+end
+
+def list_divisions
+  puts "Here are all of the divisions within this company"
+  Division.all.each { |division| puts division.name }
 end
 
 def mark_fired
